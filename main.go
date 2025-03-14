@@ -20,6 +20,9 @@ func main() {
 	http.HandleFunc("/api/products", handlers.ProductIndex)
 	http.HandleFunc("/api/products/{product_id}", handlers.ProductShow)
 
+	// Users
+	http.HandleFunc("/api/users", handlers.UserCreate)
+
 	fmt.Printf("Starting server at port %s", port)
 	fmt.Println()
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
