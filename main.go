@@ -18,6 +18,7 @@ func main() {
 
 	// Products
 	http.HandleFunc("/api/products", handlers.ProductIndex)
+	http.HandleFunc("/api/products/{product_id}", handlers.ProductShow)
 
 	fmt.Printf("Starting server at port %s", port)
 	fmt.Println()

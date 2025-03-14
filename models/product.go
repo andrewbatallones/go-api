@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -42,4 +43,13 @@ func AllProducts(conn *pgxpool.Pool) ([]Product, error) {
 	}
 
 	return products, nil
+}
+
+func FindProduct(conn *pgxpool.Pool, product_id int) (*Product, error) {
+	var p Product
+	query := fmt.Sprintf("SELECT * FROM products WHERE id = %d LIMIT 1", product_id)
+
+	err := conn.QueryRow(context.Background(), query).Scan(&p.Id, &p.UserId, &p.Title, &p.Description, &p.Price, &p.IsAvailable)
+
+	return &p, err
 }
