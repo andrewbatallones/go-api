@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func Healthcheck(w http.ResponseWriter, r *http.Request) {
@@ -21,12 +21,12 @@ func Healthcheck(w http.ResponseWriter, r *http.Request) {
 }
 
 func testConnection() bool {
-	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
+	conn, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		return false
 	}
-	defer conn.Close(context.Background())
+	defer conn.Close()
 
 	var test string
 	err = conn.QueryRow(context.Background(), "SELECT 'Testing'").Scan(&test)
