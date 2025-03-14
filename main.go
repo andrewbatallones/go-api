@@ -11,8 +11,13 @@ import (
 
 func main() {
 	port := utils.GetEnv("port", "8080")
+
+	// Main
 	http.HandleFunc("/", handlers.Index)
 	http.HandleFunc("/healthcheck", handlers.Healthcheck)
+
+	// Products
+	http.HandleFunc("/api/products", handlers.ProductIndex)
 
 	fmt.Printf("Starting server at port %s", port)
 	fmt.Println()

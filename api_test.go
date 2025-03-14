@@ -29,3 +29,14 @@ func TestHealthcheck(t *testing.T) {
 		t.Errorf("Did not get a successful response, got %d", resp.Result().StatusCode)
 	}
 }
+
+func TestProductsIndex(t *testing.T) {
+	req, _ := http.NewRequest(http.MethodGet, "/api/products", nil)
+	resp := httptest.NewRecorder()
+
+	handlers.ProductIndex(resp, req)
+
+	if resp.Result().StatusCode != http.StatusOK {
+		t.Errorf("Did not get a successful response, got %d", resp.Result().StatusCode)
+	}
+}
