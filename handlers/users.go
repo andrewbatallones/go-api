@@ -16,6 +16,8 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+
 	var payload map[string]interface{}
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&payload)
