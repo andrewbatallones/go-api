@@ -23,6 +23,9 @@ func main() {
 	// Users
 	http.HandleFunc("/api/users", handlers.UserCreate)
 
+	// Sessions
+	http.HandleFunc("/api/sessions", handlers.Sessions)
+
 	fmt.Printf("Starting server at port %s", port)
 	fmt.Println()
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))

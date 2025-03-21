@@ -3,16 +3,21 @@ package models
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
+	"strings"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	Id       *int   `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	password string `json:"-"`
+	Id           *int   `json:"id"`
+	Name         string `json:"name"`
+	Email        string `json:"email"`
+	password     string `json:"-"`
+	passwordHash string `json:"-"`
 }
 
 func (u *User) Create(conn *pgxpool.Pool) error {
@@ -42,4 +47,44 @@ func (u *User) encryptPassword() (string, error) {
 	}
 
 	return string(bytes), nil
+}
+
+// Checks the password against the user.
+func (u *User) CheckPassword(password string) bool {
+	if len(password) == 0 {
+		return false
+	}
+
+	return bcrypt.CompareHashAndPassword([]byte(u.passwordHash), []byte(password)) == nil
+}
+
+func FindByUser(conn *pgxpool.Pool, params map[string]string) (*User, error) {
+	whereClause := []string{}
+
+	for field, value := range params {
+		whereClause = append(whereClause, fmt.Sprintf("%s = '%s'", field, value))
+	}
+
+	var u User
+	query := fmt.Sprintf("SELECT id, name, email, password_hash FROM users WHERE %s LIMIT 1", strings.Join(whereClause, " AND "))
+
+	err := conn.QueryRow(context.Background(), query).Scan(&u.Id, &u.Name, &u.Email, &u.passwordHash)
+
+	return &u, err
+}
+
+func (u *User) GenerateJWT() (string, error) {
+	key, ok := os.LookupEnv("JWT_SALT")
+	if !ok {
+		return "", errors.New("unable to find salt")
+	}
+
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"iss":     "go-api",
+			"sub":     u.Name,
+			"user_id": u.Id,
+		})
+
+	return t.SignedString([]byte(key))
 }
