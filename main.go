@@ -12,21 +12,23 @@ import (
 func main() {
 	port := utils.GetEnv("port", "8080")
 
+	mux := http.NewServeMux()
+
 	// Main
-	http.HandleFunc("/", handlers.Index)
-	http.HandleFunc("/healthcheck", handlers.Healthcheck)
+	mux.HandleFunc("/", handlers.Index)
+	mux.HandleFunc("/healthcheck", handlers.Healthcheck)
 
 	// Products
-	http.HandleFunc("/api/products", handlers.ProductIndex)
-	http.HandleFunc("/api/products/{product_id}", handlers.ProductShow)
+	mux.HandleFunc("/api/products", handlers.ProductIndex)
+	mux.HandleFunc("/api/products/{product_id}", handlers.ProductShow)
 
 	// Users
-	http.HandleFunc("/api/users", handlers.UserCreate)
+	mux.HandleFunc("/api/users", handlers.UserCreate)
 
 	// Sessions
-	http.HandleFunc("/api/sessions", handlers.Sessions)
+	mux.HandleFunc("/api/sessions", handlers.Sessions)
 
 	fmt.Printf("Starting server at port %s", port)
 	fmt.Println()
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), mux))
 }
