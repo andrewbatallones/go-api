@@ -29,16 +29,16 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user_json, ok := payload["user"].(map[string]interface{})
+	userJson, ok := payload["user"].(map[string]interface{})
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "{\"errors\": [\"Please supply a user object\"]}")
 		return
 	}
 
-	name, nameOk := user_json["name"].(string)
-	email, emailOk := user_json["email"].(string)
-	pass, passOk := user_json["password"].(string)
+	name, nameOk := userJson["name"].(string)
+	email, emailOk := userJson["email"].(string)
+	pass, passOk := userJson["password"].(string)
 
 	if !nameOk || !emailOk || !passOk {
 		w.WriteHeader(http.StatusBadRequest)
@@ -69,7 +69,7 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	created_user_json, err := json.Marshal(user)
+	createdUserJson, err := json.Marshal(user)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "issue marshalling user: %s", err)
 
@@ -78,5 +78,5 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "{\"user\": %s}", created_user_json)
+	fmt.Fprintf(w, "{\"user\": %s}", createdUserJson)
 }
