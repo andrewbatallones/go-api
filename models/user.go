@@ -4,10 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -71,20 +69,4 @@ func FindByUser(conn *pgxpool.Pool, params map[string]string) (*User, error) {
 	err := conn.QueryRow(context.Background(), query).Scan(&u.Id, &u.Name, &u.Email, &u.passwordHash)
 
 	return &u, err
-}
-
-func (u *User) GenerateJWT() (string, error) {
-	key, ok := os.LookupEnv("JWT_SALT")
-	if !ok {
-		return "", errors.New("unable to find salt")
-	}
-
-	t := jwt.NewWithClaims(jwt.SigningMethodHS256,
-		jwt.MapClaims{
-			"iss":     "go-api",
-			"sub":     u.Name,
-			"user_id": u.Id,
-		})
-
-	return t.SignedString([]byte(key))
 }

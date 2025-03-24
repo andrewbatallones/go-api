@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/andrewbatallones/api/auth"
 	"github.com/andrewbatallones/api/models"
 	"github.com/andrewbatallones/api/utils"
 )
@@ -68,14 +69,23 @@ func Sessions(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate Token
-	token, err := u.GenerateJWT()
+	token, err := auth.JWTFromUser(u)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error finding user: %s", err)
+		fmt.Fprintf(os.Stderr, "error authenticating user: %s", err)
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "{\"errors\": [\"Unable to log user in\"]}")
 		return
 	}
 
-	fmt.Fprintf(w, "{\"user\": %s, \"token\" %s}", user_json, token)
+	token_json, err := json.Marshal(token)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "issue marshalling token: %s", err)
+
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "{\"errors\": [\"Unable to log user in\"]}")
+		return
+	}
+
+	fmt.Fprintf(w, "{\"user\": %s, \"token\" %s}", user_json, token_json)
 }
