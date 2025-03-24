@@ -24,6 +24,7 @@ func main() {
 
 	// Users
 	mux.HandleFunc("/api/users", handlers.UserCreate)
+	mux.HandleFunc("/api/users/{user_id}", handlers.UserShow)
 
 	// Sessions
 	mux.HandleFunc("/api/sessions", handlers.Sessions)

@@ -56,6 +56,15 @@ func (u *User) CheckPassword(password string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(u.passwordHash), []byte(password)) == nil
 }
 
+func FindUser(conn *pgxpool.Pool, id int) (*User, error) {
+	var u User
+	query := fmt.Sprintf("SELECT id, name, email, password_hash FROM users WHERE id = %d LIMIT 1", id)
+
+	err := conn.QueryRow(context.Background(), query).Scan(&u.Id, &u.Name, &u.Email, &u.passwordHash)
+
+	return &u, err
+}
+
 func FindByUser(conn *pgxpool.Pool, params map[string]string) (*User, error) {
 	whereClause := []string{}
 

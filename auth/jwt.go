@@ -7,6 +7,7 @@ import (
 
 	"github.com/andrewbatallones/api/models"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type JWT struct {
@@ -51,4 +52,33 @@ func JWTFromUser(u *models.User) (*JWT, error) {
 	}
 
 	return &jwtStruct, nil
+}
+
+// Attempts to validate the token and return the user model.
+func ValidateUserJWT(conn *pgxpool.Pool, tokenString string) (*models.User, error) {
+	key, ok := os.LookupEnv("JWT_SALT")
+	if !ok {
+		return nil, errors.New("unable to find salt")
+	}
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(key), nil
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, errors.New("can't pull claims")
+	}
+	
+	// First need to parse it to float64
+	// https://pkg.go.dev/encoding/json@go1.17.5#Number
+	userId, ok := claims["user_id"].(float64)
+	if !ok {
+		return nil, errors.New("can't pull user_id from claims")
+	}
+
+	return models.FindUser(conn, int(userId))
 }
