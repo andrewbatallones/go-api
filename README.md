@@ -29,7 +29,8 @@ Essentially, There will be a catalog of products that anyone can view. They'll a
 
 This is a very basic and messy api system. I more wanted to showcase the overall theme. There are some nice-to-haves that I want to build
 
-- [ ] Need to figure out some sort of middleware for the api. Quite a bit of things are repeated.
+- [x] Need to figure out some sort of middleware for the api. Quite a bit of things are repeated.
+    - It's the the best, I need to figure out if there's a better way to implement a middleware function.
 - [ ] Need to better sanitize these queries. Right now they can be infected with SQL injection.
 - [ ] Want to introduce a centralized config file. This is where the env vars can be initialized and missing, it will not start. This will prevent some false-positives.
 - [ ] GitHub Actions tests are currently failing because there is currently no setup for the database to utilize the app. Add config settings to build/use/connect psql.
