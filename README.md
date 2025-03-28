@@ -32,3 +32,4 @@ This is a very basic and messy api system. I more wanted to showcase the overall
 - [ ] Need to figure out some sort of middleware for the api. Quite a bit of things are repeated.
 - [ ] Need to better sanitize these queries. Right now they can be infected with SQL injection.
 - [ ] Want to introduce a centralized config file. This is where the env vars can be initialized and missing, it will not start. This will prevent some false-positives.
+- [ ] GitHub Actions tests are currently failing because there is currently no setup for the database to utilize the app. Add config settings to build/use/connect psql.
