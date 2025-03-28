@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/andrewbatallones/api/handlers"
+	"github.com/andrewbatallones/api/middleware"
 	"github.com/andrewbatallones/api/server"
 	"github.com/andrewbatallones/api/utils"
 )
@@ -13,6 +14,9 @@ func main() {
 
 	mux := http.NewServeMux()
 	server := server.NewServer(mux, port)
+
+	// Middleware
+	server.WithMiddlewareFunc(middleware.Log)
 
 	// Main
 	server.WithHandler("/", handlers.Index)
