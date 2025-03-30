@@ -37,7 +37,7 @@ jobs:
         go-version: '1.24'
 
     - name: Set up database
-      run: psql < database/structure.sql
+      run: psql $DATABASE_URL < database/structure.sql
 
     - name: Build
       run: go build -v ./...
