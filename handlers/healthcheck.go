@@ -42,9 +42,9 @@ func (hc *HealthCheck) TestRedisConnection() {
 		return
 	}
 
-	result := rdb.Ping(context.Background())
-	if result.Err() != nil {
-		fmt.Fprintf(os.Stderr, "Redis is unable to query: %v\n", result.Err())
+	err := rdb.Ping(context.Background()).Err()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Redis is unable to query: %v\n", err)
 		hc.RedisConnection = "redis is unable to connect"
 	}
 }
