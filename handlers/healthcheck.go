@@ -11,11 +11,12 @@ import (
 )
 
 type HealthCheck struct {
-	DbConnection string `json:"db_connection"`
+	DbConnection    string `json:"db_connection"`
+	RedisConnection string `json:"redis_connection"`
 }
 
 func NewHealthCheck() HealthCheck {
-	return HealthCheck{"ok"}
+	return HealthCheck{"ok", "ok"}
 }
 
 func (hc *HealthCheck) TestConnection() {
@@ -34,11 +35,26 @@ func (hc *HealthCheck) TestConnection() {
 	}
 }
 
+func (hc *HealthCheck) TestRedisConnection() {
+	rdb, ok := utils.RedisClient()
+	if !ok {
+		hc.RedisConnection = "redis is unable to connect"
+		return
+	}
+
+	result := rdb.Ping(context.Background())
+	if result.Err() != nil {
+		fmt.Fprintf(os.Stderr, "Redis is unable to query: %v\n", result.Err())
+		hc.RedisConnection = "redis is unable to connect"
+	}
+}
+
 func Healthcheck(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	hc := NewHealthCheck()
 
 	hc.TestConnection()
+	hc.TestRedisConnection()
 
 	status, err := json.Marshal(hc)
 	if err != nil {
