@@ -12,8 +12,6 @@ import (
 )
 
 func ProductIndex(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	conn, ok := utils.Connection()
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -44,8 +42,6 @@ func ProductIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProductShow(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	conn, ok := utils.Connection()
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)

@@ -19,8 +19,6 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
 	var payload map[string]interface{}
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&payload)
@@ -85,8 +83,6 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func UserShow(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
 		w.WriteHeader(http.StatusUnauthorized)
