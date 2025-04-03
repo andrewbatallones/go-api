@@ -61,5 +61,5 @@ func Healthcheck(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "{\"status\": \"ALL ERROR\"}")
 	}
 
-	fmt.Fprintf(w, "{\"status\": \"%s\"}", status)
+	fmt.Fprintf(w, "{\"status\": %s}", status)
 }
