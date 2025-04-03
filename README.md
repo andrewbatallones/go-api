@@ -11,6 +11,16 @@ This app is just mean to be an API collection of different interfaces.
 
 Essentially, There will be a catalog of products that anyone can view. They'll also be able to search the products catalog. A client will then be able to create a user profile and from there will then be able to create/edit/delete a product.
 
+## Setup
+
+### Redis
+
+You can run the command to spin up a new docker instance of Reids. This will add a default Redis instance with no password (should be setup through the env var).
+
+```bash
+docker run --name go-api-redis -p 6379:6379 -d redis
+```
+
 ## Routes
 
 - `GET /` index
