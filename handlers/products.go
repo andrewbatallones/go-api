@@ -7,12 +7,22 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/andrewbatallones/api/cache"
 	"github.com/andrewbatallones/api/models"
 	"github.com/andrewbatallones/api/utils"
 )
 
 func ProductIndex(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	// Attempt to get cache then, send it if it's available
+	foundCache := cache.GetCache(r.URL.Path)
+	if foundCache != nil {
+		w.Header().Set("Cache-Control", foundCache.CacheControl)
+		w.Header().Set("Content-Type", foundCache.ContentType)
+		w.Header().Set("Content-Length", foundCache.ContentLength)
+		fmt.Fprint(w, foundCache.Body)
+
+		return
+	}
 
 	conn, ok := utils.Connection()
 	if !ok {
@@ -40,12 +50,25 @@ func ProductIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "{\"products\": [%s]}", json)
+	body := fmt.Sprintf("{\"products\": [%s]}", json)
+
+	// Set Cache
+	newCache := cache.Cache{
+		ContentType:   w.Header().Get("Content-Type"),
+		ContentLength: w.Header().Get("Content-Length"),
+		Body:          body,
+	}
+
+	err = newCache.SetCache(r.URL.Path)
+	if err != nil {
+		fmt.Printf("error setting cache: %s", err)
+	}
+	w.Header().Set("Cache-Control", newCache.CacheControl)
+
+	fmt.Fprint(w, body)
 }
 
 func ProductShow(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	conn, ok := utils.Connection()
 	if !ok {
 		w.WriteHeader(http.StatusInternalServerError)

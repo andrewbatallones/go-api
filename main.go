@@ -17,6 +17,7 @@ func main() {
 
 	// Middleware
 	server.WithMiddlewareFunc(middleware.Log)
+	server.WithMiddlewareFunc(middleware.SetApi)
 
 	// Main
 	server.WithHandler("/", handlers.Index)

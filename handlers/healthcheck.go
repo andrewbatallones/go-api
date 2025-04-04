@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -9,21 +10,20 @@ import (
 	"github.com/andrewbatallones/api/utils"
 )
 
-func Healthcheck(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	status := "ok"
-
-	if !testConnection() {
-		status = "database is unable to connect"
-	}
-
-	fmt.Fprintf(w, "{\"status\": \"%s\"}", status)
+type HealthCheck struct {
+	DbConnection    string `json:"db_connection"`
+	RedisConnection string `json:"redis_connection"`
 }
 
-func testConnection() bool {
+func NewHealthCheck() HealthCheck {
+	return HealthCheck{"ok", "ok"}
+}
+
+func (hc *HealthCheck) TestConnection() {
 	conn, ok := utils.Connection()
 	if !ok {
-		return false
+		hc.DbConnection = "database is unable to connect"
+		return
 	}
 	defer conn.Close()
 
@@ -31,8 +31,35 @@ func testConnection() bool {
 	err := conn.QueryRow(context.Background(), "SELECT 'Testing'").Scan(&test)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
-		return false
+		hc.DbConnection = "database is unable to connect"
+	}
+}
+
+func (hc *HealthCheck) TestRedisConnection() {
+	rdb, ok := utils.RedisClient()
+	if !ok {
+		hc.RedisConnection = "redis is unable to connect"
+		return
 	}
 
-	return true
+	err := rdb.Ping(context.Background()).Err()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Redis is unable to query: %v\n", err)
+		hc.RedisConnection = "redis is unable to connect"
+	}
+}
+
+func Healthcheck(w http.ResponseWriter, r *http.Request) {
+	hc := NewHealthCheck()
+
+	hc.TestConnection()
+	hc.TestRedisConnection()
+
+	status, err := json.Marshal(hc)
+	if err != nil {
+		fmt.Printf("unable to create status JSON: %s", err)
+		fmt.Fprint(w, "{\"status\": \"ALL ERROR\"}")
+	}
+
+	fmt.Fprintf(w, "{\"status\": %s}", status)
 }
