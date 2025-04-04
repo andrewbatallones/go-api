@@ -5,7 +5,7 @@ This app is just mean to be an API collection of different interfaces.
 - [ ] Will have a basic RESTful API structure
 - [x] Inclues JWT Authentication
 - [ ] Searching
-- [ ] Will have caching
+- [x] Caching
 
 ## What can this API do
 
@@ -19,6 +19,14 @@ You can run the command to spin up a new docker instance of Reids. This will add
 
 ```bash
 docker run --name go-api-redis -p 6379:6379 -d redis
+```
+
+## Tests
+
+You can run the tests via the go command
+
+```bash
+go test -v ./...
 ```
 
 ## Routes
