@@ -27,7 +27,7 @@ func GetCache(path string) *Cache {
 
 	exists, err := rdb.Exists(context.Background(), fmt.Sprintf("cache:%s", path)).Result()
 	if err != nil {
-		log.Fatalf("unable to build cache: %s", err)
+		log.Printf("unable to build cache: %s", err)
 		return nil
 	} else if exists == 0 {
 		return nil
@@ -36,9 +36,11 @@ func GetCache(path string) *Cache {
 	var cache Cache
 	err = rdb.HGetAll(context.Background(), fmt.Sprintf("cache:%s", path)).Scan(&cache)
 	if err != nil {
-		log.Fatalf("unable to build cache: %s", err)
+		log.Printf("unable to build cache: %s", err)
 		return nil
 	}
+
+	log.Print("cache hit.")
 
 	return &cache
 }
@@ -55,6 +57,8 @@ func (c *Cache) SetCache(path string) error {
 	if err != nil {
 		return err
 	}
+
+	log.Print("set cache")
 
 	return rdb.Expire(context.Background(), fmt.Sprintf("cache:%s", path), 1*time.Hour).Err()
 }
