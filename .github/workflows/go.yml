@@ -11,6 +11,7 @@ on:
 
 env:
   DATABASE_URL: "postgres://goapi:password@localhost:5432"
+  REDIS_URL: "redis://user:@localhost:6379/0"
   JWT_SALT: "thisisasalt"
 
 jobs:
