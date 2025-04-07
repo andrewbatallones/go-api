@@ -21,6 +21,20 @@ You can run the command to spin up a new docker instance of Reids. This will add
 docker run --name go-api-redis -p 6379:6379 -d redis
 ```
 
+### Elasticsearch
+
+You can create a new elasticsearch instance on Docker with this command
+
+```bash
+docker run --name go-api-es01 --net elastic -p 9200:9200 -it -m 1GB docker.elastic.co/elasticsearch/elasticsearch:latest
+```
+
+You can run this command if you want to add the Kibana dashboard. Essentially, Kibana is used to monitor your Elasticsearch. You can view more here: [Elasticsearch Kibana](https://www.elastic.co/kibana).
+
+```bash
+docker run --name go-api-kib01 --net elastic -p 5601:5601 docker.elastic.co/kibana/kibana:latest
+```
+
 ## Tests
 
 You can run the tests via the go command
@@ -34,6 +48,7 @@ go test -v ./...
 - `GET /` index
 - `GET /healthcheck` healthcheck
 - `GET /api/products` list of all products
+- `GET /api/products/search` search products
 - `CREATE /api/products` Creates a new product
 - `GET /api/products/:product_id` Gets a detailed description of a product
 - `PUT /api/products/:product_id` Updates the product
