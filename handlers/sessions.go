@@ -11,6 +11,11 @@ import (
 	"github.com/andrewbatallones/api/utils"
 )
 
+type SessionBody struct {
+	User  *models.User `json:"user"`
+	Token *auth.JWT    `json:"token"`
+}
+
 func Sessions(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.NotFound(w, r)
@@ -57,15 +62,6 @@ func Sessions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user_json, err := json.Marshal(u)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "issue marshalling user: %s", err)
-
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "{\"errors\": [\"Unable to log user in\"]}")
-		return
-	}
-
 	// Generate Token
 	token, err := auth.JWTFromUser(u)
 	if err != nil {
@@ -76,14 +72,19 @@ func Sessions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token_json, err := json.Marshal(token)
+	body := SessionBody{
+		User:  u,
+		Token: token,
+	}
+
+	body_json, err := json.Marshal(body)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "issue marshalling token: %s", err)
+		fmt.Fprintf(os.Stderr, "issue marshalling sessionBody: %s", err)
 
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "{\"errors\": [\"Unable to log user in\"]}")
 		return
 	}
 
-	fmt.Fprintf(w, "{\"user\": %s, \"token\" %s}", user_json, token_json)
+	fmt.Fprintf(w, "%s", body_json)
 }
