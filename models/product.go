@@ -18,10 +18,9 @@ type Product struct {
 
 // Attempts to save the current product to the database.
 func (p *Product) Create(conn *pgxpool.Pool) error {
-	query := "INSERT INTO products (user_id, title, description, price, is_available) VALUES ($1, $2, $3, $4, $5)"
+	query := "INSERT INTO products (user_id, title, description, price, is_available) VALUES ($1, $2, $3, $4, $5) RETURNING id"
 
-	_, err := conn.Exec(context.Background(), query, p.UserId, p.Title, p.Description, p.Price, p.IsAvailable)
-	return err
+	return conn.QueryRow(context.Background(), query, p.UserId, p.Title, p.Description, p.Price, p.IsAvailable).Scan(&p.Id)
 }
 
 func AllProducts(conn *pgxpool.Pool) ([]Product, error) {
@@ -52,4 +51,11 @@ func FindProduct(conn *pgxpool.Pool, product_id int) (*Product, error) {
 	err := conn.QueryRow(context.Background(), query).Scan(&p.Id, &p.UserId, &p.Title, &p.Description, &p.Price, &p.IsAvailable)
 
 	return &p, err
+}
+
+func (p *Product) Update(conn *pgxpool.Pool) error {
+	updater := fmt.Sprintf("SET title = '%s', description = '%s', price = %d, is_available = '%v'", p.Title, p.Description, p.Price, p.IsAvailable)
+	_, err := conn.Exec(context.Background(), fmt.Sprintf("UPDATE products %s;", updater))
+
+	return err
 }
